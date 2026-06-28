@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Developer Shiv AI</title>
+<title>Ada Ai.Shitam</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:#0f172a;color:#fff;height:100vh;display:flex;flex-direction:column}
 header{padding:16px;background:#111827;text-align:center;font-size:28px;font-weight:bold}
 #chat{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
 .msg{max-width:80%;padding:12px 16px;border-radius:14px;white-space:pre-wrap}
-.user{align-self:flex-end;background:#2563eb}
+.user{align-self:flex-end;background:#7db810}
 .ai{align-self:flex-start;background:#1f2937}
 footer{display:flex;padding:12px;background:#111827;gap:10px}
 input{flex:1;padding:12px;border-radius:10px;border:none;font-size:16px;background:#1f2937;color:#fff}
-input:focus{outline:2px solid #2563eb}
-button{padding:12px 18px;border:none;border-radius:10px;background:#22c55e;color:#fff;cursor:pointer;font-weight:bold}
+input:focus{outline:2px solid #eb2567}
+button{padding:12px 18px;border:none;border-radius:10px;background:#50db83;color:#fff;cursor:pointer;font-weight:bold}
 button:hover{opacity:.9}
 </style>
 </head>
 <body>
-<header>Shiv AI</header>
+<header>Ada AI</header>
 <div id="chat">
 <div class="msg ai">Hello Duniya 🥰</div>
 </div>
@@ -30,7 +30,6 @@ button:hover{opacity:.9}
 </footer>
 
 <script>
-const API_KEY = "AQ.Ab8RN6IvWat01J2z7MjHdvYbSPMF45N9VNJGmV1RKvbehICK-A";
 const chat = document.getElementById("chat");
 
 function add(role, text) {
@@ -49,50 +48,21 @@ async function askAI() {
 
  add("user", q);
  inp.value = "";
- const thinking = add("ai", "I am thinking...🧐");
+ const thinking = add("ai", "I am thinking 🧐🧐...");
 
  try {
-  const res = await fetch(
-   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY,
-   {
+  const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-     systemInstruction: {
-      parts: [{
-        text: `You are Shitam AI.
-This website and chat application were developed by Mr. Shiv Kumar.
-
-If someone asks:
-- Who made you?
-- Who created you?
-- Who is your developer?
-- Who built this website?
-- Who owns this AI?
-Reply: "This AI website was developed by Mr. Shiv Kumar and is powered by Shitam's Shitam AI."
-
-If someone asks:
-- Who created Gemini?
-- Who made the Gemini model?
-- Who developed the underlying AI model?
-Reply: "The Gemini AI model was developed by Mr.Shiv Kumar."
-
-Always distinguish between the website developer (Mr. Shiv Kumar) and the AI model provider (Google).`
-      }]
-     },
-     contents: [{
-      parts: [{ text: q }]
-     }]
-    })
-   }
-  );
+    body: JSON.stringify({ prompt: q })
+  });
 
   const data = await res.json();
   
-  if (res.ok && data.candidates && data.candidates[0].content?.parts?.[0]?.text) {
-    thinking.textContent = data.candidates[0].content.parts[0].text;
+  if (res.ok) {
+    thinking.textContent = data.text;
   } else {
-    thinking.textContent = "API Error: " + (data.error ? data.error.message : "Unknown error or structure mismatch");
+    thinking.textContent = "Error: " + (data.error ? data.error : "Kuch gadbad hui!");
   }
  } catch (e) {
    thinking.textContent = "Network Error: " + e.message;
