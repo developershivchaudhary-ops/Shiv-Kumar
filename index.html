@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,13 +13,14 @@ header{padding:16px;background:#111827;text-align:center;font-size:28px;font-wei
 .user{align-self:flex-end;background:#2563eb}
 .ai{align-self:flex-start;background:#1f2937}
 footer{display:flex;padding:12px;background:#111827;gap:10px}
-input{flex:1;padding:12px;border-radius:10px;border:none;font-size:16px}
-button{padding:12px 18px;border:none;border-radius:10px;background:#22c55e;color:#fff;cursor:pointer}
+input{flex:1;padding:12px;border-radius:10px;border:none;font-size:16px;background:#1f2937;color:#fff}
+input:focus{outline:2px solid #2563eb}
+button{padding:12px 18px;border:none;border-radius:10px;background:#22c55e;color:#fff;cursor:pointer;font-weight:bold}
 button:hover{opacity:.9}
 </style>
 </head>
 <body>
-<header>Developer Shiv AI</header>
+<header>Shiv AI</header>
 <div id="chat">
 <div class="msg ai">Hello Duniya 🥰</div>
 </div>
@@ -29,46 +30,77 @@ button:hover{opacity:.9}
 </footer>
 
 <script>
-const API_KEY="AQ.Ab8RN6IvWat01J2z7MjHdvYbSPMF45N9VNJGmV1RKvbehICK-A";
-const chat=document.getElementById("chat");
-function add(role,text){
- const d=document.createElement("div");
- d.className="msg "+role;
- d.textContent=text;
+const API_KEY = "AQ.Ab8RN6IvWat01J2z7MjHdvYbSPMF45N9VNJGmV1RKvbehICK-A";
+const chat = document.getElementById("chat");
+
+function add(role, text) {
+ const d = document.createElement("div");
+ d.className = "msg " + role;
+ d.textContent = text;
  chat.appendChild(d);
- chat.scrollTop=chat.scrollHeight;
+ chat.scrollTop = chat.scrollHeight;
  return d;
 }
-async function askAI(){
- const inp=document.getElementById("question");
- const q=inp.value.trim();
- if(!q)return;
- add("user",q);
- inp.value="";
- const thinking=add("ai","Thinking...");
- try{
-  const res=await fetch(
-   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+API_KEY,
+
+async function askAI() {
+ const inp = document.getElementById("question");
+ const q = inp.value.trim();
+ if (!q) return;
+
+ add("user", q);
+ inp.value = "";
+ const thinking = add("ai", "I am thinking...🧐");
+
+ try {
+  const res = await fetch(
+   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY,
    {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      contents:[{parts:[{text:q}]}]
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+     systemInstruction: {
+      parts: [{
+        text: `You are Shitam AI.
+This website and chat application were developed by Mr. Shiv Kumar.
+
+If someone asks:
+- Who made you?
+- Who created you?
+- Who is your developer?
+- Who built this website?
+- Who owns this AI?
+Reply: "This AI website was developed by Mr. Shiv Kumar and is powered by Shitam's Shitam AI."
+
+If someone asks:
+- Who created Gemini?
+- Who made the Gemini model?
+- Who developed the underlying AI model?
+Reply: "The Gemini AI model was developed by Mr.Shiv Kumar."
+
+Always distinguish between the website developer (Mr. Shiv Kumar) and the AI model provider (Google).`
+      }]
+     },
+     contents: [{
+      parts: [{ text: q }]
+     }]
     })
    }
   );
-  const data=await res.json();
-  if(res.ok && data.candidates){
-    thinking.textContent=data.candidates[0].content.parts[0].text;
-  }else{
-    thinking.textContent="API Error: "+(data.error?data.error.message:"Unknown error");
+
+  const data = await res.json();
+  
+  if (res.ok && data.candidates && data.candidates[0].content?.parts?.[0]?.text) {
+    thinking.textContent = data.candidates[0].content.parts[0].text;
+  } else {
+    thinking.textContent = "API Error: " + (data.error ? data.error.message : "Unknown error or structure mismatch");
   }
- }catch(e){
-   thinking.textContent="Network Error: "+e.message;
+ } catch (e) {
+   thinking.textContent = "Network Error: " + e.message;
  }
 }
-document.getElementById("question").addEventListener("keydown",e=>{
- if(e.key==="Enter")askAI();
+
+document.getElementById("question").addEventListener("keydown", e => {
+ if (e.key === "Enter") askAI();
 });
 </script>
 </body>
