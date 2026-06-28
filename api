@@ -1,0 +1,60 @@
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const API_KEY = process.env.AQ.Ab8RN6KuioDv8nOM5IwmUreJ_ZhtRPTJkeW2AALmNvi5HyIpLA; 
+  const { prompt } = req.body;
+
+  if (!API_KEY) {
+    return res.status(500).json({ error: "Backend me API Key set nahi hai!" });
+  }
+
+  try {
+    const googleRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{
+              text: `You are Developer Shiv AI.
+This website and chat application were developed by Mr. Shiv Kumar.
+
+If someone asks:
+- Who made you?
+- Who created you?
+- Who is your developer?
+- Who built this website?
+- Who owns this AI?
+Reply: "This AI website was developed by Mr. Shiv Kumar and is powered by Shitam's Ada AI."
+
+If someone asks:
+- Who created you?
+- Who made the your model?
+- Who developed the underlying AI model?
+Reply: "The Ada AI model was developed by Shitam. (Mr.Shiv Chaudhary)"
+
+Always distinguish between the website developer (Mr. Shiv Kumar) and the AI model provider (Shitam).`
+            }]
+          },
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      }
+    );
+
+    const data = await googleRes.json();
+
+    if (googleRes.ok && data.candidates && data.candidates[0].content?.parts?.[0]?.text) {
+      const aiText = data.candidates[0].content.parts[0].text;
+      return res.status(200).json({ text: aiText });
+    } else {
+      const errMsg = data.error ? data.error.message : "Google API Se Galat Response Mila";
+      return res.status(500).json({ error: errMsg });
+    }
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
